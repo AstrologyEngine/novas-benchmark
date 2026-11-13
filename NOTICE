@@ -1,0 +1,8 @@
+Original benchmark code: Copyright 2026 Jack Asher, MIT.
+SuperNOVAS 1.8.0: Sigmyne / Attila Kovacs and contributors, Unlicense.
+CALCEPH 5.0.1: IMCCE / Observatoire de Paris, used under CeCILL-B.
+Retain the accompanying dependency licenses when distributing native binaries.
+CALCEPH source and documentation: https://calceph.imcce.fr/
+SuperNOVAS source and documentation: https://sigmyne.github.io/SuperNOVAS/
+JPL DE440s is acquired unmodified from NASA NAIF, not relicensed as MIT:
+https://naif.jpl.nasa.gov/naif/rules.html

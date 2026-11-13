@@ -1,6 +1,6 @@
 # SuperNOVAS benchmark implementation contract
 
-Status: repository setup only; no working service or validation evidence yet.
+Status: live Sun/Moon HTTP service implemented; broader chart coverage and library QC remain outstanding. See README for reproducible setup.
 
 ## Approved boundaries
 - Public target repository: AstrologyEngine/novas-benchmark. Original code MIT; dependencies retain their terms.
