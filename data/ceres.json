@@ -1,0 +1,10 @@
+{
+  "spk_file_id": "20000001",
+  "result": "*******************************************************************************\nJPL/HORIZONS                  1 Ceres (A801 AA)            2026-Nov-13 12:38:42\nRec #:       1 (+COV) Soln.date: 2021-Apr-13_11:04:44   # obs: 1075 (1995-2021)\n \nIAU76/J2000 helio. ecliptic osc. elements (au, days, deg., period=Julian yrs):\n \n  EPOCH=  2458849.5 ! 2020-Jan-01.00 (TDB)         Residual RMS= .24563\n   EC= .07687465013145245  QR= 2.556401146697176   TP= 2458240.1791309435\n   OM= 80.3011901917491    W=  73.80896808746482   IN= 10.59127767086216\n   A= 2.769289292143484    MA= 130.3159688200986   ADIST= 2.982177437589792\n   PER= 4.60851            N= .213870844           ANGMOM= .028541613\n   DAN= 2.69515            DDN= 2.81323            L= 153.8445987\n   B= 10.1666387           MOID= 1.59231997        TP= 2018-May-01.6791309435\n \nAsteroid physical parameters (km, seconds, rotational period in hours):\n   GM= 62.6284             RAD= 469.7              ROTPER= 9.07417\n   H= 3.34                 G= .120                 B-V= .713\n                           ALBEDO= .090            STYP= C\n\nASTEROID comments: \n1: soln ref.= JPL#48, OCC=0           radar(60 delay, 0 Dop.)\n2: source=ORB\n*******************************************************************************\n\nID= '20000001'\n\n",
+  "signature": {
+    "version": "1.2",
+    "source": "NASA/JPL Horizons API"
+  },
+  "requestUrl": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%271%3B%27&EPHEM_TYPE=SPK&START_TIME=%271849-01-01%27&STOP_TIME=%272150-01-01%27&OBJ_DATA=YES",
+  "sha256": "7af67832bbd60a3a0b6f3643a7eb7de25964cd6f4b4f1005ea637da1564993fc"
+}

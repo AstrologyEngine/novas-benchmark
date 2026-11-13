@@ -1,6 +1,6 @@
 # SuperNOVAS benchmark implementation contract
 
-Status: repository setup only; no working service or validation evidence yet.
+Status: major planets, symbolic Earth, Lahiri/Fagan-Bradley offsets and strict comparisons implemented. Independent houses and mean/osculating nodes are implemented. Native/Wasm library QC covers bodies, nodes, offsets and houses; polar rejections are retained as failing evidence. Ceres/Chiron are implemented with pinned Horizons inputs. Legacy-service retirement and full acceptance remain outstanding. See README for reproducible setup.
 
 ## Approved boundaries
 - Public target repository: AstrologyEngine/novas-benchmark. Original code MIT; dependencies retain their terms.
@@ -17,7 +17,7 @@ Status: repository setup only; no working service or validation evidence yet.
 5. Implement PAC Lahiri and Fagan-Bradley from published definitions. Separate reported offset, projection and rate. Offset range 1800-2200 TT; chart coverage is the declared data intersection with speed margins. True Sky divisions excluded.
 6. Replace benchmark fixed corpus/legacy APIs with live Swiss adapter consuming this contract; keep cross-engine reports there.
 7. Add pinned native and configurable-chart Wasm QC to library, plus explicit full-data CI with nonzero failures and reports. Preserve calculation behavior and regression fixtures.
-8. Publish reproducible native/Docker builds, API docs, source/data provenance and validation reports.
+8. Publish reproducible native builds, API docs, source/data provenance and validation reports.
 
 ## Acceptance
 Swiss agreement and model conformance are distinct. Initial Swiss thresholds: 1 arcsecond and 1 arcsecond/day. Freeze thresholds before acceptance; no adjustment to hide discrepancies. Preserve 1 microarcsecond checks for matching Lahiri IAU 2000B definitions/instants.
@@ -27,3 +27,5 @@ The library base reports 77-term nutation but projects with five terms. Test rep
 Test published examples, geometry invariants, deterministic and held-out sweeps, angle wrapping, retrograde motion, polar geometry, coverage edges, node opposition and sidereal rates. Negative controls: perturbation, missing/duplicate cases, nonfinite values, provenance changes, unsupported configurations and incomplete coverage.
 
 Report library discrepancies and gate QC; library calculation/dataset fixes are separate work. End-to-end UTC checks and matched-time diagnostics must identify distinct planetary and geometry time conventions.
+
+Docker packaging is excluded by user decision. Both services run directly on Node.js.

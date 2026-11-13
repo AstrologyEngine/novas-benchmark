@@ -1,0 +1,22 @@
+name: Verify benchmark
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm run setup
+      - run: ctest --test-dir .build/calceph --output-on-failure
+      - run: npm test
+        env:
+          JPL_KERNEL: data/de440s.bsp

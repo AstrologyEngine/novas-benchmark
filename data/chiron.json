@@ -1,0 +1,10 @@
+{
+  "signature": {
+    "source": "NASA/JPL Horizons API",
+    "version": "1.2"
+  },
+  "result": "*******************************************************************************\nJPL/HORIZONS                2060 Chiron (1977 UB)          2026-Nov-13 12:38:45\nRec #:    2060 (+COV) Soln.date: 2026-Jun-05_06:09:00   # obs: 6026 (1895-2026)\n \nIAU76/J2000 helio. ecliptic osc. elements (au, days, deg., period=Julian yrs):\n \n  EPOCH=  2457916.5 ! 2017-Jun-12.00 (TDB)         Residual RMS= .19933\n   EC= .3824171374703196   QR= 8.427522999110739   TP= 2450143.7110841358\n   OM= 209.2011323125998   W=  339.6529896907077   IN= 6.94959060447848\n   A= 13.64597936638133    MA= 151.975605480683    ADIST= 18.86443573365193\n   PER= 50.40983           N= .019552262           ANGMOM= .058715257\n   DAN= 8.57554            DDN= 18.16269           L= 188.9914784\n   B= -2.4111988           MOID= 7.43040991        TP= 1996-Mar-01.2110841358\n \nAsteroid physical parameters (km, seconds, rotational period in hours):\n   GM= n.a.                RAD= 83.                ROTPER= 5.918\n   H= 5.54                 G= .150                 B-V= .704\n                           ALBEDO= .150            STYP= Cb\n\nASTEROID comments: \n1: soln ref.= JPL#171, OCC=0\n2: source=ORB\n*******************************************************************************\n\nID= '20002060'\n\n",
+  "spk_file_id": "20002060",
+  "requestUrl": "https://ssd.jpl.nasa.gov/api/horizons.api?format=json&COMMAND=%272060%3B%27&EPHEM_TYPE=SPK&START_TIME=%271849-01-01%27&STOP_TIME=%272150-01-01%27&OBJ_DATA=YES",
+  "sha256": "71145196b709f04f8461c386dbac472ec581e7a237a0744ff26a7fe48f2c1666"
+}
