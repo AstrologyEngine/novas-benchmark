@@ -9,14 +9,14 @@ import {bodyNames,signedAngle} from '../src/contract.mjs';
 test('PAC mean anchor and published polynomial',()=>{
   assert.ok(Math.abs(lahiriMean(2451545)-(23+51/60+25.53/3600))<1e-13);
 });
-test('major planets, original nutation model, and sidereal transformation',{skip:!process.env.JPL_KERNEL},async t=>{
+test('supported bodies, original nutation model, and sidereal transformation',{skip:!process.env.JPL_KERNEL},async t=>{
   const worker=await startWorker(process.env.JPL_KERNEL);t.after(()=>worker.close());
   // ERFA 2.0.1 t_erfa_c.c published nut00b validation, radians at MJD 53736.
   const context=await worker.context(2453736.5);
   assert.ok(Math.abs(context.dpsi2000b*Math.PI/180-(-0.9632552291148362783e-5))<1e-13);
   assert.ok(Math.abs(context.deps2000b*Math.PI/180-0.4063197106621159367e-4)<1e-13);
   const result=await calculate(worker,{jdTT:2451545,bodies:bodyNames,zodiac:'lahiri'});
-  assert.equal(Object.keys(result.bodies).length,11);
+  assert.equal(Object.keys(result.bodies).length,bodyNames.length);
   for(const body of bodyNames){
     assert.ok(Math.abs(signedAngle(result.tropicalBodies[body].longitude,result.bodies[body].longitude)-result.offsets.projection)<1e-12);
     assert.equal(result.bodies[body].declination,result.tropicalBodies[body].declination);

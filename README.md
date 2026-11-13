@@ -3,7 +3,8 @@
 An MIT-licensed live benchmark using SuperNOVAS and CALCEPH, with ERFA for the
 original IAU 2000B conformance check. It currently covers Sun, Moon, Mercury
 through Pluto, symbolic Earth, tropical coordinates, PAC Lahiri and
-Fagan-Bradley offsets. Houses, lunar nodes and minor bodies remain pending.
+Fagan-Bradley offsets, four house systems, and mean/osculating lunar nodes.
+Minor bodies remain pending.
 
 ## Build and run
 
@@ -79,3 +80,20 @@ Placidus is undefined at or beyond the polar circle. An explicit Porphyry
 fallback can be requested. Exact geographic poles and degenerate horizon
 intersections return HTTP 422. No invented cusp set is returned for undefined
 geometry. Whole Sign cusps are constructed from the selected-zodiac Ascendant.
+
+## Lunar nodes
+
+Include `NORTH_NODE` and/or `SOUTH_NODE` in `bodies`. `nodeMode` selects
+`osculating` (default) or `mean`; `southNode` selects `symbolic` (default,
+same declination as North) or `geometric` (opposite declination). Both South
+conventions use North longitude plus 180 degrees and the same longitude rate.
+These options require at least one node in the request. Null/unknown values
+are rejected. Responses state the effective choices in `nodeConvention`,
+which candidate comparisons must match exactly.
+
+Nodes are geometric directions, without light-time, aberration or deflection.
+The mean node uses the IERS/Simon lunar argument plus full nutation; the
+osculating node uses the instantaneous Moon–Earth inertial orbital plane from
+DE440s, rotated to the true ecliptic/equinox of date. Their rates use the same
+centered TT ±0.5 day sampling and selected-zodiac rate correction as planets.
+See [model definitions](docs/models.md) for sources and frame details.

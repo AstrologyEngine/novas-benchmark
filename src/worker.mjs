@@ -5,7 +5,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {nativeSourceHash,dependencyHash,serviceHash} from './identity.mjs';
-import {bodyIds,normalize} from './contract.mjs';
+import {bodyIds,nodeModes,southNodeConventions,normalize} from './contract.mjs';
 const lock=JSON.parse(readFileSync(new URL('../dependencies.json',import.meta.url)));
 const expected=lock.kernel.sha256;
 export const startWorker = async (kernel) => {
@@ -46,7 +46,12 @@ export const startWorker = async (kernel) => {
     if(!fields.every(key=>Number.isFinite(result[key]))) throw new Error('Invalid native result');
     return result;
   };
-  const calculate=async(tt,body)=>{
+  const calculate=async(tt,body,{nodeMode='osculating',southNode='symbolic'}={})=>{
+    if(body==='NORTH_NODE'||body==='SOUTH_NODE'){
+      if(!nodeModes.includes(nodeMode)||!southNodeConventions.includes(southNode))throw new Error('Invalid node convention');
+      const value=await query(tt,nodeMode==='mean'?12:13,['longitude','declination','speed']);
+      return body==='NORTH_NODE'?value:{...value,longitude:normalize(value.longitude+180),declination:southNode==='geometric'?-value.declination:value.declination};
+    }
     const id=bodyIds[body==='EARTH'?'SUN':body];
     if(!id) throw new Error('Invalid worker body');
     const value=await query(tt,id,['longitude','declination','speed']);

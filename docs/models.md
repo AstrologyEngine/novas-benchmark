@@ -67,3 +67,28 @@ These are original geometric implementations; no external house source code
 or generated reference data is included. All returned cusp sets must progress
 once around the zodiac. Polar Placidus is rejected or explicitly falls back to
 Porphyry. Exact poles and coincident horizon/ecliptic planes are undefined.
+
+## Lunar node definitions
+
+The mean ascending node is SuperNOVAS `fund_args().Omega`, evaluated in TDB
+centuries from J2000, plus full nutation in longitude. The fundamental argument
+is from [IERS Conventions 2010, chapter 5, equation 5.43](https://iers-conventions.obspm.fr/content/chapter5/icc5.pdf)
+and Simon et al. (1994). It represents a mean element, distinct from the
+instantaneous orbital plane.
+
+The osculating node starts with CALCEPH Moon (NAIF 301) relative to Earth
+(399), in the DE440s inertial frame. TT is converted to TDB for the state.
+Compute the unit orbital pole from the cross product of inertial position and
+velocity. Only then rotate the pole with SuperNOVAS frame bias, precession,
+nutation and true obliquity at TT. The reference north vector crossed with
+this pole gives the ascending intersection. This avoids mistaking a velocity
+in a rotating coordinate frame for an inertial orbital velocity. See the
+[JPL description of osculating elements](https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/cspice/oscltx_c.html).
+Zero angular momentum and coplanar poles are rejected as undefined.
+
+No light-time, aberration or gravitational deflection is applied to either
+node. The equatorial declination is that of the zero-ecliptic-latitude node
+direction using true obliquity. Geometric South negates this declination;
+symbolic South deliberately retains North declination, matching the library's
+reported opposite-body convention. Both use a 180-degree longitude offset and
+the same speed. Mean and osculating models are never silently interchanged.

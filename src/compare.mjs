@@ -6,6 +6,10 @@ export const compareResults=(reference,candidate)=>{
   if(candidate.coordinates!==reference.coordinates||candidate.speed!==reference.speed||!isRecord(candidate.offsets.models)
     ||Object.keys(candidate.offsets.models).sort().join(',')!==Object.keys(reference.offsets.models).sort().join(',')
     ||Object.entries(reference.offsets.models).some(([key,value])=>candidate.offsets.models[key]!==value))throw new Error('Candidate model mismatch');
+  if(Boolean(reference.nodeConvention)!==Boolean(candidate.nodeConvention))throw new Error('Candidate node coverage mismatch');
+  if(reference.nodeConvention&&(!isRecord(candidate.nodeConvention)
+    ||Object.keys(candidate.nodeConvention).sort().join(',')!==Object.keys(reference.nodeConvention).sort().join(',')
+    ||Object.entries(reference.nodeConvention).some(([key,value])=>candidate.nodeConvention[key]!==value)))throw new Error('Candidate node model mismatch');
   const rows=[];
   const append=(path,actual,expected,angular=false,speed=false)=>{
     if(!Number.isFinite(actual))throw new Error(`Missing/nonfinite ${path}`);

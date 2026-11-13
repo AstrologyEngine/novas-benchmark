@@ -5,8 +5,30 @@
 #include <novas.h>
 #include <novas-calceph.h>
 #include <erfa.h>
+#include "nodes.h"
 
-static int position(double tt, int id, double *longitude, double *declination) {
+static int node_position(t_calcephbin *kernel, double tt, int id, double *longitude, double *declination) {
+  const double degrees=180/acos(-1.0);
+  const double tdb=tt+tt2tdb(tt)/86400;
+  double obliquity, dpsi;
+  if (e_tilt(tt,NOVAS_FULL_ACCURACY,NULL,&obliquity,NULL,&dpsi,NULL)) return 1;
+  if (id==12) {
+    novas_delaunay_args arguments;
+    if (fund_args((tdb-2451545)/36525,&arguments)) return 1;
+    *longitude=fmod(arguments.Omega*degrees+dpsi/3600+360,360);
+  } else {
+    double state[6],pole[3],tod[3],ecliptic[3];
+    if (!calceph_compute_unit(kernel,2451545,tdb-2451545,301,399,
+        CALCEPH_UNIT_KM|CALCEPH_UNIT_DAY|CALCEPH_USE_NAIFID,state)) return 1;
+    if (orbital_pole(state,pole) || gcrs_to_tod(tt,NOVAS_FULL_ACCURACY,pole,tod)
+        || equ2ecl_vec(tt,NOVAS_TRUE_EQUATOR,NOVAS_FULL_ACCURACY,tod,ecliptic)
+        || ascending_node(ecliptic,longitude)) return 1;
+  }
+  *declination=asin(sin(*longitude/degrees)*sin(obliquity/degrees))*degrees;
+  return 0;
+}
+static int position(t_calcephbin *kernel, double tt, int id, double *longitude, double *declination) {
+  if (id==12 || id==13) return node_position(kernel,tt,id,longitude,declination);
   object body;
   double ra, distance, latitude;
   if (make_planet(id, &body)) return 1;
@@ -57,13 +79,13 @@ int main(int argc, char **argv) {
       continue;
     }
     if (sscanf(line, "%lf %d %c", &tt, &id, &extra) != 2 || !isfinite(tt)
-        || id < 0 || id > NOVAS_MOON || id == NOVAS_EARTH
+        || id < 0 || id > 13 || id == NOVAS_EARTH
         || (id == 0 ? (tt < 2378496.0 || tt > 2524594.0) : (tt - 1 < first || tt + 1 > last))) {
       puts("{\"error\":\"INVALID_NATIVE_INPUT\"}");
     } else if (id == 0) {
       if (context(tt)) puts("{\"error\":\"CONTEXT_UNAVAILABLE\"}");
-    } else if (position(tt, id, &lon, &dec) || position(tt - 0.5, id, &before, &unused)
-               || position(tt + 0.5, id, &after, &unused)) {
+    } else if (position(kernel, tt, id, &lon, &dec) || position(kernel, tt - 0.5, id, &before, &unused)
+               || position(kernel, tt + 0.5, id, &after, &unused)) {
       puts("{\"error\":\"REFERENCE_UNAVAILABLE\"}");
     } else {
       double speed = remainder(after - before, 360.0);
