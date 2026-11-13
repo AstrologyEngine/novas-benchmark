@@ -92,3 +92,18 @@ direction using true obliquity. Geometric South negates this declination;
 symbolic South deliberately retains North declination, matching the library's
 reported opposite-body convention. Both use a 180-degree longitude offset and
 the same speed. Mean and osculating models are never silently interchanged.
+
+## Ceres and Chiron
+
+Pinned JPL Horizons SPKs cover 1849-01-01 through 2150-01-01 TDB. Their
+returned NAIF target IDs are 20000001 (Ceres) and 20002060 (Chiron), recorded
+from the actual API response rather than assumed from older ID conventions.
+CALCEPH supplies these states through the generic SuperNOVAS ephemeris
+provider; `make_ephem_object` and `app_planet` apply the same apparent
+geocentric pipeline used for planets. Longitude and declination use the true
+frames of date and rates use centered TT ±0.5 day samples.
+
+The [official Horizons API](https://ssd-api.jpl.nasa.gov/doc/horizons.html)
+describes its base64 SPK output. Exact bytes and acquisition metadata are
+committed because later requests can use updated solutions and produce
+different files. Both data hashes are reported with every result.

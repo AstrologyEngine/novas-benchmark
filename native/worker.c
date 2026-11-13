@@ -31,7 +31,9 @@ static int position(t_calcephbin *kernel, double tt, int id, double *longitude, 
   if (id==12 || id==13) return node_position(kernel,tt,id,longitude,declination);
   object body;
   double ra, distance, latitude;
-  if (make_planet(id, &body)) return 1;
+  if (id==20000001 || id==20002060) {
+    if (make_ephem_object(id==20000001?"Ceres":"Chiron",id,&body)) return 1;
+  } else if (make_planet(id, &body)) return 1;
   if (app_planet(tt, &body, NOVAS_FULL_ACCURACY, &ra, declination, &distance)) return 1;
   return equ2ecl(tt, NOVAS_TRUE_EQUATOR, NOVAS_FULL_ACCURACY, ra, *declination, longitude, &latitude);
 }
@@ -50,12 +52,18 @@ static int context(double tt) {
   return 0;
 }
 int main(int argc, char **argv) {
-  if (argc != 2) return 2;
-  t_calcephbin *kernel = calceph_open(argv[1]);
-  if (!kernel || novas_use_calceph_planets(kernel)) return 2;
-  double first, last;
+  if (argc != 4) return 2;
+  double first=-INFINITY,last=INFINITY;
   int continuous;
-  if (!calceph_gettimespan(kernel, &first, &last, &continuous)) return 2;
+  for (int i=1;i<argc;i++) {
+    double begin,end;
+    t_calcephbin *part=calceph_open(argv[i]);
+    if (!part || !calceph_gettimespan(part,&begin,&end,&continuous) || continuous!=1 || !isfinite(begin) || !isfinite(end)) return 2;
+    first=fmax(first,begin);last=fmin(last,end);calceph_close(part);
+  }
+  if (first>=last) return 2;
+  t_calcephbin *kernel=calceph_open_array(argc-1,(const char *const *)(argv+1));
+  if (!kernel || novas_use_calceph(kernel) || novas_use_calceph_planets(kernel) || novas_calceph_use_ids(NOVAS_ID_NAIF)) return 2;
   char calceph_version[CALCEPH_MAX_CONSTANTNAME];
   calceph_getversion_str(calceph_version);
   printf("{\"ready\":true,\"first\":%.17g,\"last\":%.17g,\"supernovas\":\"%d.%d.%d\",\"calceph\":\"%s\"}\n", first, last, SUPERNOVAS_MAJOR_VERSION, SUPERNOVAS_MINOR_VERSION, SUPERNOVAS_PATCHLEVEL, calceph_version);
@@ -79,7 +87,7 @@ int main(int argc, char **argv) {
       continue;
     }
     if (sscanf(line, "%lf %d %c", &tt, &id, &extra) != 2 || !isfinite(tt)
-        || id < 0 || id > 13 || id == NOVAS_EARTH
+        || id < 0 || (id > 13 && id != 20000001 && id != 20002060) || id == NOVAS_EARTH
         || (id == 0 ? (tt < 2378496.0 || tt > 2524594.0) : (tt - 1 < first || tt + 1 > last))) {
       puts("{\"error\":\"INVALID_NATIVE_INPUT\"}");
     } else if (id == 0) {

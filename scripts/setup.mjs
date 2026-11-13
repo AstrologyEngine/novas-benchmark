@@ -6,6 +6,7 @@ import {dependencyHash,digest} from '../src/identity.mjs';
 import {resolve} from 'node:path';
 const root=resolve(import.meta.dirname,'..');
 const lock=JSON.parse(readFileSync(resolve(root,'dependencies.json')));
+for(const entry of Object.values(lock.minorKernels))if(fileHash(resolve(root,entry.path))!==entry.sha256)throw new Error('Minor kernel checksum mismatch');
 const build=resolve(root,'.build');
 const vendor=resolve(build,'vendor');
 const prefix=resolve(build,'install');

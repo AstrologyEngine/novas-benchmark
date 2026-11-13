@@ -4,7 +4,7 @@ An MIT-licensed live benchmark using SuperNOVAS and CALCEPH, with ERFA for the
 original IAU 2000B conformance check. It currently covers Sun, Moon, Mercury
 through Pluto, symbolic Earth, tropical coordinates, PAC Lahiri and
 Fagan-Bradley offsets, four house systems, and mean/osculating lunar nodes.
-Minor bodies remain pending.
+Ceres and Chiron are supported from pinned JPL Horizons kernels.
 
 ## Build and run
 
@@ -97,3 +97,17 @@ osculating node uses the instantaneous Moon–Earth inertial orbital plane from
 DE440s, rotated to the true ecliptic/equinox of date. Their rates use the same
 centered TT ±0.5 day sampling and selected-zodiac rate correction as planets.
 See [model definitions](docs/models.md) for sources and frame details.
+
+## Minor-body inputs
+
+Ceres and Chiron use SuperNOVAS apparent geocentric positions from the exact
+JPL Horizons SPKs committed under `data/`. Their request URLs, returned target
+IDs and response metadata are retained beside the binaries. Setup and startup
+verify both kernel checksums. They are supplied reference inputs; setup does
+not regenerate them from a changing online orbital solution.
+
+Advertised chart coverage is the intersection of all three kernel spans,
+with a one-day guard for rates and light-time evaluation. Discontinuous,
+nonfinite or disjoint coverage is rejected. Provenance includes separate
+`ceresDataHash` and `chironDataHash` fields. The original service code is MIT;
+JPL input provenance is retained separately in NOTICE and the metadata files.

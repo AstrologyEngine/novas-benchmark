@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-export const bodyIds=Object.freeze({SUN:10,MOON:11,MERCURY:1,VENUS:2,MARS:4,JUPITER:5,SATURN:6,URANUS:7,NEPTUNE:8,PLUTO:9});
+export const bodyIds=Object.freeze({SUN:10,MOON:11,MERCURY:1,VENUS:2,MARS:4,JUPITER:5,SATURN:6,URANUS:7,NEPTUNE:8,PLUTO:9,CERES:20000001,CHIRON:20002060});
 export const bodyNames=Object.freeze([...Object.keys(bodyIds),'EARTH','NORTH_NODE','SOUTH_NODE']);
 export const nodeModes=Object.freeze(['mean','osculating']);
 export const southNodeConventions=Object.freeze(['symbolic','geometric']);

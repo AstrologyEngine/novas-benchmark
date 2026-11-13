@@ -11,12 +11,13 @@ const expected=lock.kernel.sha256;
 export const startWorker = async (kernel) => {
   const dataHash = createHash('sha256').update(readFileSync(kernel)).digest('hex');
   if (dataHash !== expected) throw new Error('JPL DE440s checksum mismatch');
+  const minorPaths=Object.values(lock.minorKernels).map(entry=>{const path=resolve(import.meta.dirname,'..',entry.path);if(createHash('sha256').update(readFileSync(path)).digest('hex')!==entry.sha256)throw new Error('Minor kernel checksum mismatch');return path;});
   const binary = resolve(import.meta.dirname, '../.build/worker');
   const binaryHash = createHash('sha256').update(readFileSync(binary)).digest('hex');
   const manifest=JSON.parse(readFileSync(resolve(import.meta.dirname,'../.build/manifest.json')));
   if(manifest.binaryHash!==binaryHash||manifest.nativeSourceHash!==nativeSourceHash()||manifest.dependencyHash!==dependencyHash())throw new Error('Rebuild native worker: source/dependency/artifact identity mismatch');
   const codeHash=serviceHash();
-  const child = spawn(binary, [kernel], {stdio:['pipe','pipe','inherit']});
+  const child = spawn(binary, [kernel,...minorPaths], {stdio:['pipe','pipe','inherit']});
   const pending = [];
   let failure;
   const fail = (error) => { failure = error; for (const request of pending.splice(0)) request.reject(error); };
@@ -59,7 +60,7 @@ export const startWorker = async (kernel) => {
   };
   return {
     healthy:()=>!failure,
-    provenance:{engine:'SuperNOVAS',version:ready.supernovas,calceph:ready.calceph,erfa:lock.erfa.version,serviceHash:codeHash,dependencyHash:manifest.dependencyHash,dataHash,binaryHash},
+    provenance:{engine:'SuperNOVAS',version:ready.supernovas,calceph:ready.calceph,erfa:lock.erfa.version,serviceHash:codeHash,dependencyHash:manifest.dependencyHash,dataHash,binaryHash,ceresDataHash:lock.minorKernels.ceres.sha256,chironDataHash:lock.minorKernels.chiron.sha256},
     coverage:{first:ready.first + 1,last:ready.last - 1,timeScale:'TT',marginDays:1},
     calculate,
     geometry:(tt,ut1)=>query(tt,100,['siderealTime'],ut1),

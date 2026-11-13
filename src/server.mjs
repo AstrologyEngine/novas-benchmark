@@ -45,7 +45,7 @@ export const calculate=async(worker,input,offsetOnly=false)=>{
     southLongitude:'north plus 180 degrees; same longitude rate',
   }:undefined;
   return {...base,...(nodeConvention?{nodeConvention}:{}),...(geometry?{jdUT1:input.jdUT1,location:input.location,geometry}:{}),bodies,tropicalBodies,coordinates:nodeConvention?'planets apparent; nodes geometric; ecliptic of date in requested zodiac; true tropical equatorial declination':'geocentric apparent ecliptic of date in requested zodiac; true tropical equatorial declination',speed:'centered TT +/-0.5 day',
-    conventions:{EARTH:'symbolic Sun-opposite longitude; Sun speed and declination',planetTargets:'DE440s planetary system barycenters; Earth geocenter; Sun and Moon centers'}};
+    conventions:{EARTH:'symbolic Sun-opposite longitude; Sun speed and declination',planetTargets:'DE440s planetary system barycenters; Earth geocenter; Sun and Moon centers',minorTargets:'pinned JPL Horizons Ceres and Chiron centers; apparent geocentric positions'}};
 };
 export const createService=(worker)=>createServer({requestTimeout:15000},async(req,res)=>{
   const send=(status,value)=>{res.writeHead(status,{'content-type':'application/json','cache-control':'no-store'});res.end(JSON.stringify(value));};

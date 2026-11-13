@@ -18,7 +18,7 @@ test('live HTTP calculations, concurrency and invalid-input boundaries', {skip:!
   assert.ok(result.bodies.MOON.longitude>223 && result.bodies.MOON.longitude<224);
   const repeated=await Promise.all(Array.from({length:12},()=>post(request).then(r=>r.json())));
   for(const value of repeated) assert.deepEqual(value,result);
-  for(const input of [{...request,bodies:['SUN','SUN']},{...request,bodies:['CHIRON']},{...request,jdTT:0},{...request,jdTT:null},{...request,extra:true},{}]) assert.equal((await post(input)).status,400);
+  for(const input of [{...request,bodies:['SUN','SUN']},{...request,bodies:['UNSUPPORTED']},{...request,jdTT:0},{...request,jdTT:null},{...request,extra:true},{}]) assert.equal((await post(input)).status,400);
   assert.equal((await fetch(`${base}/missing`)).status,404);
   const cap=await (await fetch(`${base}/capabilities`)).json();
   assert.equal(cap.provenance.dataHash,result.provenance.dataHash);

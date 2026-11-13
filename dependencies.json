@@ -33,5 +33,19 @@
         "sha256": "0da6313033aacf9c64533a7e74be49ecda97b4aaa87e134f98287e4ff279886f"
       }
     ]
+  },
+  "minorKernels": {
+    "ceres": {
+      "path": "data/ceres.bsp",
+      "sha256": "7af67832bbd60a3a0b6f3643a7eb7de25964cd6f4b4f1005ea637da1564993fc",
+      "naifId": 20000001,
+      "metadata": "data/ceres.json"
+    },
+    "chiron": {
+      "path": "data/chiron.bsp",
+      "sha256": "71145196b709f04f8461c386dbac472ec581e7a237a0744ff26a7fe48f2c1666",
+      "naifId": 20002060,
+      "metadata": "data/chiron.json"
+    }
   }
 }
