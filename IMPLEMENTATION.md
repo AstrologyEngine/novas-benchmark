@@ -1,6 +1,6 @@
 # SuperNOVAS benchmark implementation contract
 
-Status: major planets, symbolic Earth, Lahiri/Fagan-Bradley offsets and strict comparisons implemented. Partial native/Wasm library QC is being integrated. Houses, nodes, minor bodies, Docker and full coverage remain outstanding. See README for reproducible setup.
+Status: major planets, symbolic Earth, Lahiri/Fagan-Bradley offsets and strict comparisons implemented. Partial native/Wasm library QC is being integrated. Independent houses are implemented; house QC integration is in progress. Nodes, minor bodies, Docker and full coverage remain outstanding. See README for reproducible setup.
 
 ## Approved boundaries
 - Public target repository: AstrologyEngine/novas-benchmark. Original code MIT; dependencies retain their terms.

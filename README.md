@@ -63,3 +63,19 @@ Live tests explicitly skip without JPL_KERNEL; skipped tests are not live passes
 The repository has not yet delivered complete chart coverage, a Docker image,
 or a stable release. Dependency terms are retained in NOTICE and notices/;
 original code is MIT, not a relicensing of native dependencies or JPL data.
+
+## House geometry
+
+`POST /v1/calculate` also accepts `jdUT1`, `location: {latitude, longitude}`
+(degrees, east-positive longitude), `houseSystem` (`whole-sign`, `equal`,
+`placidus`, `porphyry`) and optional `polarHouses` (`error`, default, or
+`porphyry`). Supply the time, location and system together; TT minus UT1 must
+be within one day. Bodies are still required. The response adds `geometry`
+with twelve selected-zodiac cusps, four angles, requested/actual system,
+fallback reason, GAST and true obliquity. `/v1/compare` checks every cusp and
+angle, astronomical geometry and system/model identity.
+
+Placidus is undefined at or beyond the polar circle. An explicit Porphyry
+fallback can be requested. Exact geographic poles and degenerate horizon
+intersections return HTTP 422. No invented cusp set is returned for undefined
+geometry. Whole Sign cusps are constructed from the selected-zodiac Ascendant.

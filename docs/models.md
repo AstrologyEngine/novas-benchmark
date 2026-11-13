@@ -51,3 +51,19 @@ Other angular quantities use 1 arcsecond; speeds/rates use 1 arcsecond/day.
 Missing bodies or quantities, nonfinite values and altered labels are rejected.
 Numerical agreement is distinct from absolute astronomical accuracy. Shared
 standard coefficients make exact-model checks transcription/integration checks.
+
+## Independent house geometry
+
+The native layer supplies Greenwich apparent sidereal time from SuperNOVAS
+IAU 2006 GMST plus the full equation of equinoxes, and true obliquity from
+mean obliquity plus full nutation. Both use explicit TT; rotation uses explicit
+UT1. Horizon/ecliptic intersection chooses the eastern root. Meridian/ecliptic
+intersection supplies MC. Equal houses advance 30 degrees from Ascendant;
+Whole Sign floors the selected-zodiac Ascendant to a 30-degree boundary.
+Porphyry trisects each zodiac quadrant. Placidus solves each cusp's own
+semi-diurnal or semi-nocturnal arc fraction by bracketed bisection.
+
+These are original geometric implementations; no external house source code
+or generated reference data is included. All returned cusp sets must progress
+once around the zodiac. Polar Placidus is rejected or explicitly falls back to
+Porphyry. Exact poles and coincident horizon/ecliptic planes are undefined.

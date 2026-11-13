@@ -39,10 +39,23 @@ int main(int argc, char **argv) {
   printf("{\"ready\":true,\"first\":%.17g,\"last\":%.17g,\"supernovas\":\"%d.%d.%d\",\"calceph\":\"%s\"}\n", first, last, SUPERNOVAS_MAJOR_VERSION, SUPERNOVAS_MINOR_VERSION, SUPERNOVAS_PATCHLEVEL, calceph_version);
   fflush(stdout);
   char line[256], extra;
-  double tt;
+  double tt, ut1;
   int id;
   while (fgets(line, sizeof line, stdin)) {
     double lon, dec, before, after, unused;
+    if (sscanf(line, "%lf %d %lf %c", &tt, &id, &ut1, &extra) == 3 && id == 100) {
+      double gst, equation;
+      if (!isfinite(tt) || !isfinite(ut1) || tt < first || tt > last || fabs(tt-ut1) > 1
+          || e_tilt(tt, NOVAS_FULL_ACCURACY, NULL, NULL, &equation, NULL, NULL))
+        puts("{\"error\":\"INVALID_GEOMETRY_INPUT\"}");
+      else {
+        /* Evaluate at the explicit TT: novas_gast caches UT1 without its TT offset. */
+        gst = novas_gmst(ut1, (tt-ut1)*86400) + equation/3600;
+        printf("{\"siderealTime\":%.17g}\n", fmod(gst*15+360,360));
+      }
+      fflush(stdout);
+      continue;
+    }
     if (sscanf(line, "%lf %d %c", &tt, &id, &extra) != 2 || !isfinite(tt)
         || id < 0 || id > NOVAS_MOON || id == NOVAS_EARTH
         || (id == 0 ? (tt < 2378496.0 || tt > 2524594.0) : (tt - 1 < first || tt + 1 > last))) {

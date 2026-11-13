@@ -36,11 +36,11 @@ export const startWorker = async (kernel) => {
   });
   const ready = await receive();
   if (!ready.ready || ready.supernovas !== lock.supernovas.version || ready.calceph !== lock.calceph.version) { child.kill(); throw new Error('Native initialization failed'); }
-  const query=async(tt,id,fields)=>{
+  const query=async(tt,id,fields,ut1)=>{
     if(!Number.isFinite(tt)) throw new Error('Invalid worker instant');
     if(pending.length>=128) throw new Error('Native queue full');
     const response=receive();
-    if(!failure && pending.length) child.stdin.write(`${tt} ${id}\n`);
+    if(!failure && pending.length) child.stdin.write(`${tt} ${id}${ut1===undefined?'':` ${ut1}`}\n`);
     const result=await response;
     if(result.error) throw new Error(result.error);
     if(!fields.every(key=>Number.isFinite(result[key]))) throw new Error('Invalid native result');
@@ -57,6 +57,7 @@ export const startWorker = async (kernel) => {
     provenance:{engine:'SuperNOVAS',version:ready.supernovas,calceph:ready.calceph,erfa:lock.erfa.version,serviceHash:codeHash,dependencyHash:manifest.dependencyHash,dataHash,binaryHash},
     coverage:{first:ready.first + 1,last:ready.last - 1,timeScale:'TT',marginDays:1},
     calculate,
+    geometry:(tt,ut1)=>query(tt,100,['siderealTime'],ut1),
     context:tt=>query(tt,0,['dpsi2006','deps2006','dpsi2000b','deps2000b','meanFaganBradley','meanObliquity']),
     close:()=>{child.stdin.end();child.kill();},
   };
