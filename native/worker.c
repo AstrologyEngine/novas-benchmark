@@ -4,6 +4,7 @@
 #include <math.h>
 #include <novas.h>
 #include <novas-calceph.h>
+#include <erfa.h>
 
 static int position(double tt, int id, double *longitude, double *declination) {
   object body;
@@ -11,6 +12,20 @@ static int position(double tt, int id, double *longitude, double *declination) {
   if (make_planet(id, &body)) return 1;
   if (app_planet(tt, &body, NOVAS_FULL_ACCURACY, &ra, declination, &distance)) return 1;
   return equ2ecl(tt, NOVAS_TRUE_EQUATOR, NOVAS_FULL_ACCURACY, ra, *declination, longitude, &latitude);
+}
+static int context(double tt) {
+  const double degrees = 180.0 / acos(-1.0);
+  const double b1950 = 2433282.42345905;
+  double dp, de, dpb, deb, vector[3], equinox[3] = {1, 0, 0};
+  if (iau2000a(2451545.0, tt - 2451545.0, &dp, &de)) return 1;
+  eraNut00b(2451545.0, tt - 2451545.0, &dpb, &deb);
+  if (precession(tt, equinox, b1950, vector)) return 1;
+  double epsilon = mean_obliq(b1950) / 3600.0 / degrees;
+  double longitude = atan2(vector[1]*cos(epsilon) + vector[2]*sin(epsilon), vector[0]) * degrees;
+  double mean_fagan = 24.0 + 2.0/60 + (31.36 - 0.41256)/3600 - longitude;
+  printf("{\"dpsi2006\":%.17g,\"deps2006\":%.17g,\"dpsi2000b\":%.17g,\"deps2000b\":%.17g,\"meanFaganBradley\":%.17g,\"meanObliquity\":%.17g}\n",
+    dp*degrees, de*degrees, dpb*degrees, deb*degrees, mean_fagan, mean_obliq(tt)/3600);
+  return 0;
 }
 int main(int argc, char **argv) {
   if (argc != 2) return 2;
@@ -29,8 +44,11 @@ int main(int argc, char **argv) {
   while (fgets(line, sizeof line, stdin)) {
     double lon, dec, before, after, unused;
     if (sscanf(line, "%lf %d %c", &tt, &id, &extra) != 2 || !isfinite(tt)
-        || !(id == NOVAS_SUN || id == NOVAS_MOON) || tt - 1 < first || tt + 1 > last) {
+        || id < 0 || id > NOVAS_MOON || id == NOVAS_EARTH
+        || (id == 0 ? (tt < 2378496.0 || tt > 2524594.0) : (tt - 1 < first || tt + 1 > last))) {
       puts("{\"error\":\"INVALID_NATIVE_INPUT\"}");
+    } else if (id == 0) {
+      if (context(tt)) puts("{\"error\":\"CONTEXT_UNAVAILABLE\"}");
     } else if (position(tt, id, &lon, &dec) || position(tt - 0.5, id, &before, &unused)
                || position(tt + 0.5, id, &after, &unused)) {
       puts("{\"error\":\"REFERENCE_UNAVAILABLE\"}");

@@ -12,5 +12,26 @@
   "kernel": {
     "url": "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets/de440s.bsp",
     "sha256": "c1c7feeab882263fc493a9d5a5b2ddd71b54826cdf65d8d17a76126b260a49f2"
+  },
+  "erfa": {
+    "version": "2.0.1",
+    "revision": "9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3",
+    "files": [
+      {
+        "name": "nut00b.c",
+        "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/nut00b.c",
+        "sha256": "a5246d525e987eb587bbe786b2846160e01be85b5d12af573870b89235695f49"
+      },
+      {
+        "name": "erfa.h",
+        "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/erfa.h",
+        "sha256": "9549553b95ca2fbbcdcabcc69d82fb3cdd376c28b03c2793200138ff55727088"
+      },
+      {
+        "name": "erfam.h",
+        "url": "https://raw.githubusercontent.com/liberfa/erfa/9915ba38c9365f8b0738269b8c2ac1fdd5f8dee3/src/erfam.h",
+        "sha256": "0da6313033aacf9c64533a7e74be49ecda97b4aaa87e134f98287e4ff279886f"
+      }
+    ]
   }
 }

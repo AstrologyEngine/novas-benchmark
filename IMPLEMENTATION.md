@@ -1,6 +1,6 @@
 # SuperNOVAS benchmark implementation contract
 
-Status: live Sun/Moon HTTP service implemented; broader chart coverage and library QC remain outstanding. See README for reproducible setup.
+Status: major planets, symbolic Earth, Lahiri/Fagan-Bradley offsets and strict comparisons implemented. Partial native/Wasm library QC is being integrated. Houses, nodes, minor bodies, Docker and full coverage remain outstanding. See README for reproducible setup.
 
 ## Approved boundaries
 - Public target repository: AstrologyEngine/novas-benchmark. Original code MIT; dependencies retain their terms.

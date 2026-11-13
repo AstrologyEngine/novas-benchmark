@@ -4,12 +4,18 @@ import { createInterface } from 'node:readline';
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-const expected = 'c1c7feeab882263fc493a9d5a5b2ddd71b54826cdf65d8d17a76126b260a49f2';
+import {nativeSourceHash,dependencyHash,serviceHash} from './identity.mjs';
+import {bodyIds,normalize} from './contract.mjs';
+const lock=JSON.parse(readFileSync(new URL('../dependencies.json',import.meta.url)));
+const expected=lock.kernel.sha256;
 export const startWorker = async (kernel) => {
   const dataHash = createHash('sha256').update(readFileSync(kernel)).digest('hex');
   if (dataHash !== expected) throw new Error('JPL DE440s checksum mismatch');
   const binary = resolve(import.meta.dirname, '../.build/worker');
   const binaryHash = createHash('sha256').update(readFileSync(binary)).digest('hex');
+  const manifest=JSON.parse(readFileSync(resolve(import.meta.dirname,'../.build/manifest.json')));
+  if(manifest.binaryHash!==binaryHash||manifest.nativeSourceHash!==nativeSourceHash()||manifest.dependencyHash!==dependencyHash())throw new Error('Rebuild native worker: source/dependency/artifact identity mismatch');
+  const codeHash=serviceHash();
   const child = spawn(binary, [kernel], {stdio:['pipe','pipe','inherit']});
   const pending = [];
   let failure;
@@ -29,22 +35,29 @@ export const startWorker = async (kernel) => {
     pending.push({resolve:value => {clearTimeout(timeout);resolve(value);}, reject:error => {clearTimeout(timeout);reject(error);}});
   });
   const ready = await receive();
-  if (!ready.ready || ready.supernovas !== '1.8.0' || ready.calceph !== '5.0.1') { child.kill(); throw new Error('Native initialization failed'); }
+  if (!ready.ready || ready.supernovas !== lock.supernovas.version || ready.calceph !== lock.calceph.version) { child.kill(); throw new Error('Native initialization failed'); }
+  const query=async(tt,id,fields)=>{
+    if(!Number.isFinite(tt)) throw new Error('Invalid worker instant');
+    if(pending.length>=128) throw new Error('Native queue full');
+    const response=receive();
+    if(!failure && pending.length) child.stdin.write(`${tt} ${id}\n`);
+    const result=await response;
+    if(result.error) throw new Error(result.error);
+    if(!fields.every(key=>Number.isFinite(result[key]))) throw new Error('Invalid native result');
+    return result;
+  };
+  const calculate=async(tt,body)=>{
+    const id=bodyIds[body==='EARTH'?'SUN':body];
+    if(!id) throw new Error('Invalid worker body');
+    const value=await query(tt,id,['longitude','declination','speed']);
+    return body==='EARTH'?{...value,longitude:normalize(value.longitude+180)}:value;
+  };
   return {
     healthy:()=>!failure,
-    provenance:{engine:'SuperNOVAS',version:ready.supernovas,calceph:ready.calceph,dataHash,binaryHash},
+    provenance:{engine:'SuperNOVAS',version:ready.supernovas,calceph:ready.calceph,erfa:lock.erfa.version,serviceHash:codeHash,dependencyHash:manifest.dependencyHash,dataHash,binaryHash},
     coverage:{first:ready.first + 1,last:ready.last - 1,timeScale:'TT',marginDays:1},
-    calculate: async (tt, body) => {
-      const id = {SUN:10,MOON:11}[body];
-      if (!id || !Number.isFinite(tt)) throw new Error('Invalid worker request');
-      if (pending.length >= 128) throw new Error('Native queue full');
-      const response = receive();
-      if (!failure && pending.length) child.stdin.write(`${tt} ${id}\n`);
-      const result = await response;
-      if (result.error) throw new Error(result.error);
-      if (!['longitude','declination','speed'].every(key => Number.isFinite(result[key]))) throw new Error('Invalid native result');
-      return result;
-    },
-    close: () => {child.stdin.end();child.kill();},
+    calculate,
+    context:tt=>query(tt,0,['dpsi2006','deps2006','dpsi2000b','deps2000b','meanFaganBradley','meanObliquity']),
+    close:()=>{child.stdin.end();child.kill();},
   };
 };

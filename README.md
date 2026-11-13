@@ -1,15 +1,13 @@
 # SuperNOVAS benchmark
 
-MIT-licensed benchmark service around SuperNOVAS and CALCEPH. Current working
-slice: live geocentric apparent tropical Sun/Moon longitude, equatorial
-declination, and centered one-day longitudinal speed. This is not yet the full
-chart benchmark: other planets, houses, nodes, sidereal offsets, comparison API,
-Docker packaging and library QC are still pending.
+An MIT-licensed live benchmark using SuperNOVAS and CALCEPH, with ERFA for the
+original IAU 2000B conformance check. It currently covers Sun, Moon, Mercury
+through Pluto, symbolic Earth, tropical coordinates, PAC Lahiri and
+Fagan-Bradley offsets. Houses, lunar nodes and minor bodies remain pending.
 
 ## Build and run
 
-Requires Node.js 22+, C99 compiler, make, CMake, git, curl and tar. macOS ARM64
-has been exercised. Downloads and native builds stay in ignored local folders.
+Requires Node.js 22+, a C99 compiler, make, CMake, git, curl and tar.
 
 ```sh
 npm run setup
@@ -17,28 +15,51 @@ JPL_KERNEL=data/de440s.bsp npm test
 JPL_KERNEL=data/de440s.bsp npm start
 ```
 
-The service binds only to 127.0.0.1:8788. No remote deployment or bearer mode is
-implemented yet. GET /health reports native worker health. GET /capabilities
-reports supported inputs, guarded coverage and provenance.
+Setup verifies pinned sources, rebuilds native dependencies cleanly and records
+linked-artifact hashes. Downloads recover from interrupted caches. Later edits
+to original native code need `npm run build:native`; dependency or recipe changes
+need `npm run setup`. Builds/data stay in ignored `.build/` and `data/` folders.
+The service binds only to localhost port 8788. Remote/bearer mode and Docker
+packaging remain pending. Native globals are isolated in a serialized worker.
+
+## HTTP contract
+
+GET /health reports worker readiness. GET /capabilities lists supported bodies,
+zodiacs and coverage. Every result identifies source, binary, dependency and data
+hashes. Startup rejects stale native builds or changed kernel bytes.
 
 ```sh
 curl --fail http://127.0.0.1:8788/v1/calculate \
   -H 'Content-Type: application/json' \
-  -d '{"jdTT":2451545,"bodies":["SUN","MOON"]}'
+  -d '{"jdTT":2451545,"bodies":["SUN","MOON","MARS"],"zodiac":"lahiri"}'
 ```
 
-POST /v1/calculate accepts only jdTT and a nonempty unique selection of SUN/MOON.
-All three quantities are returned for each selected body. Longitude/declination
-are degrees; speed is degrees per TT day. TT is converted internally by
-SuperNOVAS for JPL ephemeris evaluation. Coverage includes a conservative one-day
-margin for centered samples and light time. Invalid inputs fail with HTTP 400;
-calculation errors return HTTP 503 without fabricated values.
+`POST /v1/calculate`: explicit TT Julian date, unique nonempty body selection,
+and optional zodiac (`tropical`, `lahiri`, `fagan-bradley`; default tropical).
+Returns selected and tropical bodies, reported/projection offsets and centered
+one-day rates. Units are degrees and degrees/day. All requested bodies supply
+longitude, speed and declination. Chart time coverage is guarded by one day
+inside DE440s coverage for sample and light-time calculations.
 
-The worker serializes native calculations in one process; parallel HTTP requests
-are correlated in FIFO order. Startup verifies DE440s bytes against the pinned
-SHA-256. Responses include kernel and executable hashes. See dependencies.json
-for source revisions and download hashes, and NOTICE for third-party terms.
+`POST /v1/offsets`: `{jdTT, zodiac}` without bodies. Supports 1800-01-01 through
+2200-01-01 TT inclusive, independently of the planetary kernel's date coverage.
+The current worker still requires the verified kernel to initialize.
 
-Without JPL_KERNEL, live tests are explicitly skipped; that is not a live pass.
-The independent Swiss agreement harness and all its reports belong exclusively
-to the separate AGPL benchmark repository.
+`POST /v1/compare`: `{input, candidate}`, where input is a calculate request and
+candidate has the corresponding complete calculation shape. It rejects model
+and coverage mismatches and reports per-quantity residuals with fixed thresholds.
+HTTP 200 means comparison ran; inspect `pass`. HTTP 400 indicates invalid inputs,
+415 wrong media type, 413 excessive request size, 503 reference unavailable.
+
+See [model definitions](docs/models.md) for the distinction between reported and
+applied Lahiri offsets and why original IAU 2000B uses a separate implementation.
+The external cross-engine harness and reports remain in the separate AGPL repo.
+
+## Evidence and remaining work
+
+Tests cover live calculations, concurrent requests, reference/model identity,
+negative comparisons, original-model published checks and download recovery.
+Live tests explicitly skip without JPL_KERNEL; skipped tests are not live passes.
+The repository has not yet delivered complete chart coverage, a Docker image,
+or a stable release. Dependency terms are retained in NOTICE and notices/;
+original code is MIT, not a relicensing of native dependencies or JPL data.

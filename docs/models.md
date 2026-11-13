@@ -1,0 +1,53 @@
+# Calculation definitions
+
+Positions use SuperNOVAS 1.8.0 full-accuracy apparent geocentric positions and
+its true equator/ecliptic of date. JPL DE440s supplies planetary system
+barycenters, Earth geocenter and Sun/Moon centers through CALCEPH. Speed is a
+centered one-TT-day difference; equatorial declination is never projected.
+EARTH is explicitly symbolic Sun-opposite longitude with Sun speed/declination.
+
+## Lahiri
+
+The mean formula is transcribed from the PAC Indian Astronomical Ephemeris
+2027, printed page 382. The official PDF was read independently from
+https://packolkata.imd.gov.in/download/IAE2027.zip (linked by IMD).
+The constant is 23 degrees 51 minutes 25.53 seconds at J2000, with the printed
+precession polynomial in TT centuries. The printed T^4 coefficient is retained
+literally; it is not fitted to another engine.
+
+The reported offset adds original IAU 2000B nutation, implemented by ERFA
+2.0.1 eraNut00b (77 luni-solar terms and the Luzum planetary-bias offsets).
+The separate projection adds SuperNOVAS full IAU 2000A R06 nutation to match
+the tropical coordinates it calculates. The centered daily rate is the change
+in the projection offset. These two offsets differ slightly and are reported
+separately; neither is a transcription of library calculation code.
+
+The IAE page 423 definition is mean plus nutation in longitude. Its January 1,
+2027 tabulated true value (24 degrees 14 minutes 13.9 seconds) provides a rounded
+published check, distinct from sub-microarcsecond implementation agreement.
+
+SuperNOVAS 1.8.0's function named iau2000b no longer implements original IAU
+2000B: since 1.4.2 it uses a truncated IAU 2006 series. Therefore the original
+model check uses the separately pinned ERFA implementation, not that name.
+Primary sources: SuperNOVAS src/c99/nutation.c at the pinned revision; ERFA
+src/nut00b.c and src/t_erfa_c.c at the pinned revision (dependencies.json).
+
+## Fagan-Bradley
+
+The definition is B1950 JD 2433282.42345905, mean offset 24 degrees 02 minutes
+31.36 seconds with the 0.41256 arcsecond modern-precession correction.
+SuperNOVAS P03 precession transports the date equinox to the B1950 frame;
+its longitude in the mean B1950 ecliptic gives the accumulated offset.
+Reported and applied offsets add the same full IAU 2000A R06 nutation.
+Definition discussion: https://www.astro.com/swisseph/swisseph.htm
+Only the documented definition is used; no implementation or reference tables
+from that software are incorporated here.
+
+## Comparison gates
+
+Model conformance requires matching coordinate, speed and offset-model labels.
+Reported Lahiri values in the same original-2000B convention use 1 microarcsecond.
+Other angular quantities use 1 arcsecond; speeds/rates use 1 arcsecond/day.
+Missing bodies or quantities, nonfinite values and altered labels are rejected.
+Numerical agreement is distinct from absolute astronomical accuracy. Shared
+standard coefficients make exact-model checks transcription/integration checks.
