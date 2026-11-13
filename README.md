@@ -20,8 +20,7 @@ Setup verifies pinned sources, rebuilds native dependencies cleanly and records
 linked-artifact hashes. Downloads recover from interrupted caches. Later edits
 to original native code need `npm run build:native`; dependency or recipe changes
 need `npm run setup`. Builds/data stay in ignored `.build/` and `data/` folders.
-The service binds only to localhost port 8788. Remote/bearer mode and Docker
-packaging remain pending. Native globals are isolated in a serialized worker.
+The service binds only to localhost port 8788. Remote/bearer mode remains pending. Native globals are isolated in a serialized worker.
 
 ## HTTP contract
 
@@ -61,7 +60,7 @@ The external cross-engine harness and reports remain in the separate AGPL repo.
 Tests cover live calculations, concurrent requests, reference/model identity,
 negative comparisons, original-model published checks and download recovery.
 Live tests explicitly skip without JPL_KERNEL; skipped tests are not live passes.
-The repository has not yet delivered complete chart coverage, a Docker image,
+The repository has not yet delivered complete chart coverage
 or a stable release. Dependency terms are retained in NOTICE and notices/;
 original code is MIT, not a relicensing of native dependencies or JPL data.
 
